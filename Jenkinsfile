@@ -1,10 +1,13 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKER_IMAGE = 'arindam0998/my-django-app'
+    }
+
     stages {
         stage('Checkout') {
             steps {
-                // Clone the repository
                 git 'https://github.com/Arindam-98/deployment-test-non-prod.git'
             }
         }
@@ -12,8 +15,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Build the Docker image
-                    def app = docker.build("my-django-app")
+                    // Build and tag the Docker image with prefix
+                    def app = docker.build("${DOCKER_IMAGE}:${env.BUILD_NUMBER}")
                 }
             }
         }
@@ -22,7 +25,7 @@ pipeline {
             steps {
                 script {
                     // Run tests using the Docker image
-                    docker.image("my-django-app").inside {
+                    docker.image("${DOCKER_IMAGE}:${env.BUILD_NUMBER}").inside {
                         sh 'python manage.py test'
                     }
                 }
@@ -32,9 +35,8 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    // Log in to Docker Hub and push the image
                     docker.withRegistry('https://index.docker.io/v1/', 'docker-hub-credentials-id') {
-                        def app = docker.build("my-django-app")
+                        def app = docker.build("${DOCKER_IMAGE}:${env.BUILD_NUMBER}")
                         app.push("${env.BUILD_NUMBER}")
                         app.push("latest")
                     }
@@ -44,7 +46,6 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
-                // Deploy the app using kubectl
                 sh '''
                 kubectl apply -f k8s/deployment.yaml
                 kubectl apply -f k8s/service.yaml
@@ -55,10 +56,9 @@ pipeline {
 
     post {
         always {
-            // Clean up workspace and Docker images after the pipeline
             cleanWs()
             script {
-                docker.image("my-django-app").inside {
+                docker.image("${DOCKER_IMAGE}:${env.BUILD_NUMBER}").inside {
                     sh 'docker system prune -f'
                 }
             }
