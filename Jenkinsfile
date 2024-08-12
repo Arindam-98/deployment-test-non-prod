@@ -5,7 +5,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Clone the repository
-                git 'https://github.com/your-repo/your-project.git'
+                git 'https://github.com/Arindam-98/deployment-test-non-prod.git'
             }
         }
 
@@ -13,7 +13,7 @@ pipeline {
             steps {
                 script {
                     // Build the Docker image
-                    def app = docker.build("your-docker-image-name")
+                    def app = docker.build("my-django-app")
                 }
             }
         }
@@ -22,7 +22,7 @@ pipeline {
             steps {
                 script {
                     // Run tests using the Docker image
-                    docker.image("your-docker-image-name").inside {
+                    docker.image("my-django-app").inside {
                         sh 'python manage.py test'
                     }
                 }
@@ -34,7 +34,7 @@ pipeline {
                 script {
                     // Log in to Docker Hub and push the image
                     docker.withRegistry('https://index.docker.io/v1/', 'docker-hub-credentials-id') {
-                        def app = docker.build("your-docker-image-name")
+                        def app = docker.build("my-django-app")
                         app.push("${env.BUILD_NUMBER}")
                         app.push("latest")
                     }
@@ -58,7 +58,7 @@ pipeline {
             // Clean up workspace and Docker images after the pipeline
             cleanWs()
             script {
-                docker.image("your-docker-image-name").inside {
+                docker.image("my-django-app").inside {
                     sh 'docker system prune -f'
                 }
             }
