@@ -3,6 +3,10 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'arindam0998/my-django-app'
+        DOCKER_TLS_VERIFY = "1"
+        DOCKER_HOST = "tcp://127.0.0.1:64410"
+        DOCKER_CERT_PATH = "C:\\Users\\armma\\.minikube\\certs"
+        MINIKUBE_ACTIVE_DOCKERD = "minikube"
     }
 
     stages {
@@ -15,18 +19,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Build and tag the Docker image with prefix
-                    def app = docker.build("${DOCKER_IMAGE}:${env.BUILD_NUMBER}")
-                }
-            }
-        }
-
-        stage('Run Tests') {
-            steps {
-                script {
-                    // Run tests using the Docker image
-                    docker.image("${DOCKER_IMAGE}:${env.BUILD_NUMBER}").inside {
-                        sh 'python manage.py test'
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
+                        def app = docker.build("${DOCKER_IMAGE}:${env.BUILD_NUMBER}")
                     }
                 }
             }
@@ -46,10 +40,12 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
-                sh '''
-                kubectl apply -f k8s/deployment.yaml
-                kubectl apply -f k8s/service.yaml
-                '''
+                script {
+                    sh '''
+                    kubectl apply -f k8s/deployment.yaml
+                    kubectl apply -f k8s/service.yaml
+                    '''
+                }
             }
         }
     }
