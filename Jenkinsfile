@@ -13,6 +13,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 git 'https://github.com/Arindam-98/deployment-test-non-prod.git'
+                   credentialsId: 'arindam0998'
             }
         }
 
