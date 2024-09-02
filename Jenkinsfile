@@ -12,7 +12,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/Arindam-98/deployment-test-non-prod.git
+                git url: 'https://github.com/Arindam-98/deployment-test-non-prod.git'
             }
         }
 
