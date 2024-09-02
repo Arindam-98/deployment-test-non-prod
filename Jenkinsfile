@@ -2,10 +2,11 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'arindam0998/my-django-app'
-        DOCKER_TLS_VERIFY = "0"  // Disables TLS verification
-        DOCKER_HOST = "unix:///var/run/docker.sock"  // Using Unix socket
-        // MINIKUBE_ACTIVE_DOCKERD not needed unless relevant to your setup
+    DOCKER_IMAGE = 'arindam0998/my-django-app'
+    DOCKER_TLS_VERIFY = "1"
+    DOCKER_HOST = "tcp://127.0.0.1:64410"
+    DOCKER_CERT_PATH = "/workspace/certs"
+    MINIKUBE_ACTIVE_DOCKERD = "minikube"
     }
 
     stages {
