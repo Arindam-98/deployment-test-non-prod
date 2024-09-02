@@ -4,8 +4,8 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'arindam0998/my-django-app'
         DOCKER_TLS_VERIFY = "0"  // Disables TLS verification
-        DOCKER_HOST = "unix:///var/run/docker.sock"  // Use the Unix socket
-        MINIKUBE_ACTIVE_DOCKERD = "minikube"
+        DOCKER_HOST = "unix:///var/run/docker.sock"  // Using Unix socket
+        // MINIKUBE_ACTIVE_DOCKERD not needed unless relevant to your setup
     }
 
     stages {
@@ -35,7 +35,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', 'docker-hub-credentials-id') {
-                        def app = docker.build("${DOCKER_IMAGE}:${env.BUILD_NUMBER}")
+                        def app = docker.image("${DOCKER_IMAGE}:${env.BUILD_NUMBER}")
                         app.push("${env.BUILD_NUMBER}")
                         app.push("latest")
                     }
