@@ -10,6 +10,7 @@ pipeline {
     }
 
     stages {
+
         stage('Test Git Commands') {
             steps {
                 sh '''
@@ -17,9 +18,8 @@ pipeline {
                 git remote -v
                 '''
             }
-          }
-
-    stages {
+        }
+        
         stage('Checkout') {
             steps {
                 git url: 'https://github.com/Arindam-98/deployment-test-non-prod.git'
