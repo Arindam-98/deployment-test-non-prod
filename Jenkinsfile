@@ -17,6 +17,7 @@ pipeline {
                 git remote -v
                 '''
             }
+          }
 
     stages {
         stage('Checkout') {
