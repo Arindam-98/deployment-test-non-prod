@@ -22,6 +22,18 @@ pipeline {
             }
         }
 
+        stage('Debug Docker CLI') {
+    steps {
+        script {
+            sh '''
+            docker info
+            ls -l /workspace/certs
+            cat /workspace/certs/ca.pem
+            '''
+           }
+          }
+          }  
+
         stage('Build Docker Image') {
             steps {
                 script {
