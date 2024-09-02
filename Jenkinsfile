@@ -2,25 +2,22 @@ pipeline {
     agent any
 
     environment {
-    DOCKER_IMAGE = 'arindam0998/my-django-app'
-    DOCKER_TLS_VERIFY = "0"  // Disables TLS verification
-    DOCKER_HOST = "tcp://127.0.0.1:64410"
-    MINIKUBE_ACTIVE_DOCKERD = "minikube"
+        DOCKER_IMAGE = 'arindam0998/my-django-app'
+        DOCKER_TLS_VERIFY = "0"  // Disables TLS verification
+        DOCKER_HOST = "unix:///var/run/docker.sock"  // Use the Unix socket
+        MINIKUBE_ACTIVE_DOCKERD = "minikube"
     }
 
     stages {
-
         stage('Test Git Commands') {
             steps {
-                sh '''
-                git --version
-                '''
+                sh 'git --version'
             }
         }
-        
+
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/Arindam-98/deployment-test-non-prod.git' , credentialsId: 'b1f704e2-6f8a-4167-85ec-0acbd9770d64'
+                git url: 'https://github.com/Arindam-98/deployment-test-non-prod.git', credentialsId: 'b1f704e2-6f8a-4167-85ec-0acbd9770d64'
             }
         }
 
