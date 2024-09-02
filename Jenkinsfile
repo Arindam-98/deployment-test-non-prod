@@ -14,15 +14,14 @@ pipeline {
         stage('Test Git Commands') {
             steps {
                 sh '''
-                git status
-                git remote -v
+                git --version
                 '''
             }
         }
         
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/Arindam-98/deployment-test-non-prod.git'
+                git url: 'https://github.com/Arindam-98/deployment-test-non-prod.git' , credentialsId: 'b1f704e2-6f8a-4167-85ec-0acbd9770d64'
             }
         }
 
