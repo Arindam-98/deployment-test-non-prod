@@ -2,11 +2,8 @@ pipeline {
     agent any
 
     environment {
-    DOCKER_IMAGE = 'arindam0998/my-django-app'
-    DOCKER_TLS_VERIFY = "1"
-    DOCKER_HOST = "unix:///var/run/docker.sock"
-    DOCKER_CERT_PATH = "/workspace/certs"
-    MINIKUBE_ACTIVE_DOCKERD = "minikube"
+        DOCKER_IMAGE = 'arindam0998/my-django-app'
+        DOCKER_HOST = "unix:///var/run/docker.sock"
     }
 
     stages {
@@ -23,16 +20,16 @@ pipeline {
         }
 
         stage('Debug Docker CLI') {
-    steps {
-        script {
-            sh '''
-            docker info
-            ls -l /workspace/certs
-            cat /workspace/certs/ca.pem
-            '''
-           }
-          }
-          }  
+            steps {
+                script {
+                    sh '''
+                    docker info
+                    ls -l /workspace/certs
+                    cat /workspace/certs/ca.pem
+                    '''
+                }
+            }
+        }
 
         stage('Build Docker Image') {
             steps {
@@ -47,7 +44,7 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', 'docker-hub-credentials-id') {
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
                         def app = docker.image("${DOCKER_IMAGE}:${env.BUILD_NUMBER}")
                         app.push("${env.BUILD_NUMBER}")
                         app.push("latest")
