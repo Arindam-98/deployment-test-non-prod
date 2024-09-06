@@ -4,7 +4,7 @@ pipeline {
     environment {
     DOCKER_IMAGE = 'arindam0998/my-django-app'
     DOCKER_TLS_VERIFY = "1"
-    DOCKER_HOST = "tcp://127.0.0.1:64410"
+    DOCKER_HOST = "unix:///var/run/docker.sock"
     DOCKER_CERT_PATH = "/workspace/certs"
     MINIKUBE_ACTIVE_DOCKERD = "minikube"
     }
