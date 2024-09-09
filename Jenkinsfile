@@ -57,9 +57,9 @@ pipeline {
             steps {
                 script {
                     sh '''
-                    kubectl apply -f deployment.yaml
-                    kubectl apply -f service.yaml
-                    '''
+                       kubectl apply -f /var/jenkins_home/workspace/myproject/deployment.yaml
+                       kubectl apply -f /var/jenkins_home/workspace/myproject/service.yaml
+                       '''
                 }
             }
         }
