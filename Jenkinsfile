@@ -48,8 +48,8 @@ pipeline {
                 script {
                     // Apply Kubernetes manifests
                     sh '''
-                    kubectl apply -f deployment.yaml --kubeconfig $KUBECONFIG
-                    kubectl apply -f service.yaml --kubeconfig $KUBECONFIG
+                    kubectl apply -f /var/jenkins_home/workspace/deployment.yaml --kubeconfig /var/jenkins_home/.kube/config
+                    kubectl apply -f /var/jenkins_home/workspace/service.yaml --kubeconfig /var/jenkins_home/.kube/config
                     '''
                 }
             }
