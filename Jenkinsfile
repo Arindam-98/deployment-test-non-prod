@@ -4,6 +4,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'arindam0998/my-django-app'
         DOCKER_HOST = "unix:///var/run/docker.sock"
+        KUBECONFIG = "/var/jenkins_home/.kube/config" // Point to kubeconfig in Jenkins
     }
 
     stages {
@@ -15,19 +16,8 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/Arindam-98/deployment-test-non-prod.git'
-            }
-        }
-
-        stage('Debug Docker CLI') {
-            steps {
-                script {
-                    sh '''
-                    docker info
-                    ls -l /workspace/certs
-                    cat /workspace/certs/ca.pem
-                    '''
-                }
+                // Checkout from GitHub
+                git url: 'https://github.com/Arindam-98/deployment-test-non-prod.git', credentialsId: 'b1f704e2-6f8a-4167-85ec-0acbd9770d64'
             }
         }
 
@@ -56,10 +46,11 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
+                    // Apply Kubernetes manifests
                     sh '''
-                       kubectl apply -f /var/jenkins_home/workspace/deployment.yaml
-                       kubectl apply -f /var/jenkins_home/workspace/service.yaml
-                       '''
+                    kubectl apply -f deployment.yaml --kubeconfig $KUBECONFIG
+                    kubectl apply -f service.yaml --kubeconfig $KUBECONFIG
+                    '''
                 }
             }
         }
