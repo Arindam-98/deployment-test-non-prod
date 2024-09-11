@@ -7,7 +7,7 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
-    - port: 8080
+    - port: 30000
       targetPort: 8080
   selector:
     app: hello-node
