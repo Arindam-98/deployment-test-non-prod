@@ -5,6 +5,7 @@ pipeline {
         DOCKER_IMAGE = 'arindam0998/my-django-app'
         DOCKER_HOST = "unix:///var/run/docker.sock"
         KUBECONFIG = "/var/jenkins_home/.kube/config" // Point to kubeconfig in Jenkins
+        KUBE_NAMESPACE = 'default' // Set your desired namespace
     }
 
     stages {
@@ -24,6 +25,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
+                    // Build Docker image using Dockerfile from repo
                     docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
                         def app = docker.build("${DOCKER_IMAGE}:${env.BUILD_NUMBER}")
                     }
@@ -34,10 +36,11 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
+                    // Push image to Docker Hub
                     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
                         def app = docker.image("${DOCKER_IMAGE}:${env.BUILD_NUMBER}")
-                        app.push("${env.BUILD_NUMBER}")
-                        app.push("latest")
+                        app.push("${env.BUILD_NUMBER}") // Push with build number
+                        app.push("latest") // Tag latest version
                     }
                 }
             }
@@ -48,8 +51,20 @@ pipeline {
                 script {
                     // Apply Kubernetes manifests
                     sh '''
-                    kubectl apply -f /var/jenkins_home/workspace/deployment.yaml --kubeconfig /var/jenkins_home/.kube/config
-                    kubectl apply -f /var/jenkins_home/workspace/service.yaml --kubeconfig /var/jenkins_home/.kube/config
+                    kubectl apply -f ${WORKSPACE}/deployment.yaml --kubeconfig ${KUBECONFIG} -n ${KUBE_NAMESPACE}
+                    kubectl apply -f ${WORKSPACE}/service.yaml --kubeconfig ${KUBECONFIG} -n ${KUBE_NAMESPACE}
+                    '''
+                }
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                script {
+                    // Verify pods and services
+                    sh '''
+                    kubectl get pods -n ${KUBE_NAMESPACE} --kubeconfig ${KUBECONFIG}
+                    kubectl get services -n ${KUBE_NAMESPACE} --kubeconfig ${KUBECONFIG}
                     '''
                 }
             }
@@ -58,9 +73,10 @@ pipeline {
 
     post {
         always {
-            cleanWs()
+            cleanWs() // Clean up workspace
             script {
                 docker.image("${DOCKER_IMAGE}:${env.BUILD_NUMBER}").inside {
+                    // Clean up Docker resources
                     sh 'docker system prune -f'
                 }
             }
